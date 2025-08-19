@@ -14,3 +14,5 @@ trafilatura>=1.7.0
 
 # Utilities
 numpy>=1.26.0
+
+flask
