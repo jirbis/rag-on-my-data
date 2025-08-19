@@ -28,6 +28,17 @@ pip install -r requirements.txt
 # (Optional, improves parsing)
 brew install tesseract poppler libmagic
 
+# Find supported AI models
+python list_models.py
+
+# Example output
+Supported fastembed models:
+- BAAI/bge-small-en-v1.5 (384 dimensions)
+- BAAI/bge-base-en-v1.5 (768 dimensions)
+- intfloat/e5-base-v2 (768 dimensions)
+- intfloat/multilingual-e5-large (1024 dimensions)
+- BAAI/bge-m3 (1024 dimensions)
+
 # Put your PDFs/HTMLs into ./data (subfolders supported)
 export EMB_MODEL="BAAI/bge-small-en-v1.5"  # or any supported fastembed model
 export OMP_NUM_THREADS=4 CHUNK_SIZE=800 CHUNK_OVERLAP=120 ADD_BATCH_SIZE=800 EMB_BATCH=128
