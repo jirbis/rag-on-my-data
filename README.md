@@ -29,7 +29,7 @@ pip install -r requirements.txt
 brew install tesseract poppler libmagic
 
 # Put your PDFs/HTMLs into ./data (subfolders supported)
-export EMB_MODEL="intfloat/multilingual-e5-large"  # or any supported fastembed model
+export EMB_MODEL="BAAI/bge-small-en-v1.5"  # or any supported fastembed model
 export OMP_NUM_THREADS=4 CHUNK_SIZE=800 CHUNK_OVERLAP=120 ADD_BATCH_SIZE=800 EMB_BATCH=128
 
 # Build the vector store
