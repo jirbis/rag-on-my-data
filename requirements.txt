@@ -1,13 +1,16 @@
-chromadb
-sentence-transformers
-fastapi
-uvicorn
-pillow
-unstructured
-python-docx
-mammoth
-pandas
-openpyxl
-xlrd
-pypdf
-ollama
+# Core vector database
+chromadb>=0.5.0
+
+# Embeddings (fast, local CPU-based)
+fastembed>=0.3.1
+
+# PDF parsing
+pdfminer.six>=20221105
+pypdf>=4.0.0
+
+# HTML parsing
+beautifulsoup4>=4.12.2
+trafilatura>=1.7.0
+
+# Utilities
+numpy>=1.26.0
