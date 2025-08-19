@@ -1,24 +1,50 @@
-# 📚 RAG on My Data
+# Local RAG Vector on macOS (No GPU, No Torch)
 
-Your local RAG (Retrieval-Augmented Generation) server powered by Ollama, ChromaDB, and Moondream, running fully offline on your own machine.
+Torch-free local pipeline to index PDF/HTML into a Chroma vector store using `fastembed`, and query it on a Mac without GPU.
 
----
+## Features
+- Recursive ingestion of `.pdf`, `.html`, `.htm`
+- Clean HTML extraction (`trafilatura` + BeautifulSoup)
+- PDF parsing via `pdfminer.six` with `pypdf` fallback
+- Lightweight chunking (no LangChain)
+- Embeddings with `fastembed` (ONNX/CPU, no PyTorch)
+- Chroma persistent vector DB
+- Search with filters (by extension, filename, top-level folder)
 
-## 📦 Project structure
-
-- `install_rag_stack.sh` — automatic installation of all necessary components
-- `requirements.txt` — Python dependencies
-- `ingest.py` — script for indexing files into ChromaDB
-- `search.py` — simple CLI search tool
-- `cron_example.txt` — example for automatic re-indexing
-- `rag_data/` — folder for your initial files
-
----
-
-## 🛠 Installation
+## Quick Start
 
 ```bash
-git clone https://github.com/jirbis/rag-on-my-data.git
-cd rag-on-my-data
-bash install_rag_stack.sh
+# create project folder
+mkdir -p ~/rag-local-mac && cd ~/rag-local-mac
+
+# create files from this README (copy content into matching filenames)
+
+# Python env
+python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# (Optional, improves parsing)
+brew install tesseract poppler libmagic
+
+# Find supported AI models
+python list_models.py
+
+# Example output
+Supported fastembed models:
+- BAAI/bge-small-en-v1.5 (384 dimensions)
+- BAAI/bge-base-en-v1.5 (768 dimensions)
+- intfloat/e5-base-v2 (768 dimensions)
+- intfloat/multilingual-e5-large (1024 dimensions)
+- BAAI/bge-m3 (1024 dimensions)
+
+# Put your PDFs/HTMLs into ./data (subfolders supported)
+export EMB_MODEL="BAAI/bge-small-en-v1.5"  # or any supported fastembed model
+export OMP_NUM_THREADS=4 CHUNK_SIZE=800 CHUNK_OVERLAP=120 ADD_BATCH_SIZE=800 EMB_BATCH=128
+
+# Build the vector store
+python ingest.py ./data ./vectordb
+
+# Query
+python search.py ./vectordb "Find the licensing section" -k 8 --ext .html --name license

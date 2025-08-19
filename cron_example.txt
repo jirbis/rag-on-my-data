@@ -1,6 +1,0 @@
-# Example of setting up auto re-ingestion every 6 hours
-# Open crontab editor:
-# crontab -e
-
-# Add this line to re-ingest data every 6 hours
-0 */6 * * * /home/your_username/rag-stack/venv/bin/python3 /home/your_username/rag-stack/ingest.py --folder /mnt/fritzbox/data --rebuild
