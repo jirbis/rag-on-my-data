@@ -86,21 +86,21 @@ By default, it runs on http://127.0.0.1:8000.
 
 Example request (JSON output)
 ```bash
-curl "http://127.0.0.1:5000/search?query=Huna&output=json"
+curl "http://127.0.0.1:8000/search?query=Huna&output=json"
 ```
 
 Example request (HTML output)
 
 Open in browser:
 ```bash
-http://127.0.0.1:5000/search?query=Huna&output=html
+http://127.0.0.1:8000/search?query=Huna&output=html
 ```
 
 Web Form Interface
 
 Navigate to:
 
-http://127.0.0.1:5000/
+http://127.0.0.1:8000/
 
 
 From there you can:
