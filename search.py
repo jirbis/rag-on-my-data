@@ -6,11 +6,12 @@ from fastembed import TextEmbedding
 
 os.environ.setdefault("OMP_NUM_THREADS", "4")
 
-def color(s):  # простая подсветка терминальной выдачи
+def color(s):  
+    # Simple terminal bold highlight
     return f"\033[1m{s}\033[0m"
 
 def highlight(snippet, query):
-    # выделяем кусочки слов из запроса
+    # Highlight query words inside the retrieved text
     words = [w for w in re.split(r"\W+", query) if len(w) > 2]
     out = snippet
     for w in set(words):
@@ -24,35 +25,27 @@ def main():
     p.add_argument("-k", type=int, default=5)
     p.add_argument("--model", default=os.getenv("EMB_MODEL", "BAAI/bge-small-en-v1.5"))
     p.add_argument("--ext", default=None, help="Filter by extension, e.g. .pdf or .html")
-    p.add_argument("--name", default=None, help="Filter by source_name substring")
+    p.add_argument("--name", default=None, help="Filter by substring in source_name")
     args = p.parse_args()
 
+    # Connect to Chroma persistent database
     client = chromadb.PersistentClient(path=args.db_dir)
     coll = client.get_or_create_collection(name="docs", metadata={"hnsw:space": "cosine"})
 
-    # автовыбор поддерживаемой модели fastembed
-    supported = {m["model"] for m in TextEmbedding.list_supported_models()}
-    requested = args.model
-    if requested not in supported:
-        candidates = [
-            "intfloat/multilingual-e5-large",
-            "BAAI/bge-small-en-v1.5",
-            "BAAI/bge-base-en-v1.5",
-            "intfloat/e5-base-v2",
-        ]
-        requested = next((c for c in candidates if c in supported), next(iter(supported)))
-        print(f"[INFO] Модель не поддерживается. Использую: {requested}")
+    # Use model from ENV or CLI (no auto-fallback)
+    emb = TextEmbedding(model_name=args.model)
 
-    emb = TextEmbedding(model_name=requested)
+    # Encode the query into vector
     q_vec = np.array(list(emb.query_embed([args.query]))[0], dtype="float32").reshape(1, -1)
 
-    # where-фильтр по метаданным
+    # Build metadata filter if provided
     where = {}
     if args.ext:
         where["ext"] = args.ext
     if args.name:
         where["source_name"] = {"$contains": args.name}
 
+    # Query the vector database
     res = coll.query(query_embeddings=q_vec, n_results=args.k, where=where if where else None)
 
     ids      = res.get("ids", [[]])[0]
@@ -60,6 +53,7 @@ def main():
     metas    = res.get("metadatas", [[]])[0]
     dists    = res.get("distances", [[]])[0]
 
+    # Pretty print results
     for i, (rid, doc, meta, d) in enumerate(zip(ids, docs, metas, dists), 1):
         print("="*90)
         print(f"{color(f'Rank {i}')} | distance={d:.4f}")
@@ -72,4 +66,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
